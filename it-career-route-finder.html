@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IT Route Finder — where could Computing take you?</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0F1530;
+    --panel:#1A2148;
+    --panel-hover:#212a58;
+    --border:#323d72;
+    --teal:#4CE0B3;
+    --coral:#FF6B4A;
+    --text:#EDEFF7;
+    --muted:#8891B0;
+    --radius:2px;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family:'Inter',sans-serif;
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3,.display{
+    font-family:'Space Grotesk',sans-serif;
+    font-weight:600;
+    line-height:1.15;
+    margin:0;
+  }
+  .wrap{
+    max-width:760px;
+    margin:0 auto;
+    padding:32px 24px 80px;
+  }
+  .brand{
+    display:flex;
+    align-items:baseline;
+    justify-content:space-between;
+    gap:16px;
+    margin-bottom:36px;
+  }
+  .brand h1{font-size:19px;letter-spacing:0.2px;}
+  .brand span{color:var(--teal);}
+  .brand small{color:var(--muted);font-size:13px;}
+
+  /* ---- route progress ---- */
+  .route{
+    display:flex;
+    align-items:center;
+    margin-bottom:40px;
+  }
+  .route .seg{
+    flex:1;
+    height:2px;
+    background:var(--border);
+    position:relative;
+  }
+  .route .seg.done{background:var(--teal);}
+  .route .node{
+    width:11px;height:11px;
+    border-radius:50%;
+    background:var(--panel);
+    border:2px solid var(--border);
+    flex:0 0 auto;
+  }
+  .route .node.done{background:var(--teal);border-color:var(--teal);}
+  .route .node.current{border-color:var(--coral);background:var(--coral);}
+
+  .q-counter{color:var(--muted);font-size:13px;margin-bottom:10px;}
+  .q-text{font-size:26px;margin-bottom:28px;max-width:22ch;}
+
+  .option{
+    display:block;
+    width:100%;
+    text-align:left;
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-left:3px solid var(--border);
+    color:var(--text);
+    font-family:'Inter',sans-serif;
+    font-size:16px;
+    padding:16px 18px;
+    margin-bottom:10px;
+    cursor:pointer;
+    transition:border-color .12s ease, background .12s ease;
+  }
+  .option:hover{background:var(--panel-hover);border-left-color:var(--teal);}
+  .option:focus-visible{outline:2px solid var(--teal);outline-offset:2px;}
+  .option.selected{border-left-color:var(--coral);background:var(--panel-hover);}
+
+  .nav-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-top:28px;
+  }
+  .btn{
+    font-family:'Space Grotesk',sans-serif;
+    font-weight:600;
+    font-size:15px;
+    border:1px solid var(--border);
+    background:transparent;
+    color:var(--text);
+    padding:11px 20px;
+    cursor:pointer;
+    transition:border-color .12s ease, color .12s ease;
+  }
+  .btn:hover{border-color:var(--teal);color:var(--teal);}
+  .btn:disabled{opacity:0.35;cursor:not-allowed;}
+  .btn.primary{
+    background:var(--coral);
+    border-color:var(--coral);
+    color:#171012;
+  }
+  .btn.primary:hover{border-color:var(--coral);color:#171012;filter:brightness(1.08);}
+  .btn.primary:disabled{background:var(--panel);border-color:var(--border);color:var(--muted);}
+
+  /* ---- results ---- */
+  .dest-label{color:var(--muted);font-size:13px;margin-bottom:6px;}
+  .dest-name{font-size:32px;margin-bottom:6px;}
+  .dest-tagline{color:var(--teal);font-size:16px;margin-bottom:18px;font-family:'Space Grotesk',sans-serif;font-weight:500;}
+  .dest-blurb{font-size:16px;max-width:58ch;margin-bottom:8px;color:#DADEEE;}
+  .close-match{color:var(--muted);font-size:14px;margin-bottom:32px;}
+  .close-match strong{color:var(--text);}
+
+  .stage-line{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:8px;
+    margin:36px 0 40px;
+    position:relative;
+  }
+  .stage-line::before{
+    content:"";
+    position:absolute;
+    top:5px;left:5%;right:5%;
+    height:2px;
+    background:var(--border);
+    z-index:0;
+  }
+  .stage{position:relative;z-index:1;}
+  .stage .dot{width:12px;height:12px;border-radius:50%;background:var(--teal);margin-bottom:10px;}
+  .stage .stage-label{font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:13px;margin-bottom:4px;}
+  .stage .stage-detail{color:var(--muted);font-size:12.5px;line-height:1.4;}
+
+  section.block{margin-bottom:36px;}
+  section.block h2{font-size:15px;color:var(--muted);font-weight:600;margin-bottom:14px;}
+
+  .target{
+    display:flex;
+    align-items:flex-start;
+    gap:12px;
+    padding:12px 0;
+    border-bottom:1px solid var(--border);
+    cursor:pointer;
+  }
+  .target:last-child{border-bottom:none;}
+  .target input{
+    margin-top:3px;
+    width:16px;height:16px;
+    accent-color:var(--teal);
+    flex:0 0 auto;
+    cursor:pointer;
+  }
+  .target span{font-size:15.5px;}
+  .target.checked span{color:var(--muted);text-decoration:line-through;}
+
+  .routes-list{color:#DADEEE;font-size:15px;padding-left:18px;margin:0;}
+  .routes-list li{margin-bottom:8px;}
+
+  .footer-row{
+    display:flex;
+    gap:12px;
+    margin-top:44px;
+    flex-wrap:wrap;
+  }
+
+  @media (max-width:520px){
+    .stage-line{grid-template-columns:repeat(2,1fr);row-gap:24px;}
+    .stage-line::before{display:none;}
+    .dest-name{font-size:26px;}
+    .q-text{font-size:22px;}
+  }
+
+  @media (prefers-reduced-motion:reduce){
+    *{transition:none !important;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="brand">
+    <h1>IT Route <span>Finder</span></h1>
+    <small>Year 12 BTEC IT — where could this subject take you?</small>
+  </div>
+
+  <!-- QUIZ SCREEN -->
+  <div id="quiz-screen">
+    <div class="route" id="route" aria-hidden="true"></div>
+    <div class="q-counter" id="qCounter"></div>
+    <h2 class="q-text" id="qText"></h2>
+    <div id="options"></div>
+    <div class="nav-row">
+      <button class="btn" id="backBtn">Back</button>
+      <button class="btn primary" id="nextBtn" disabled>Next question</button>
+    </div>
+  </div>
+
+  <!-- RESULTS SCREEN -->
+  <div id="results-screen" hidden>
+    <div class="dest-label">Your likely destination</div>
+    <div class="dest-name" id="destName"></div>
+    <div class="dest-tagline" id="destTagline"></div>
+    <p class="dest-blurb" id="destBlurb"></p>
+    <p class="close-match" id="closeMatch"></p>
+
+    <div class="stage-line" id="stageLine"></div>
+
+    <section class="block">
+      <h2>Getting there from here</h2>
+      <ul class="routes-list" id="routesList"></ul>
+    </section>
+
+    <section class="block">
+      <h2>Your targets, starting now</h2>
+      <div id="targetsList"></div>
+    </section>
+
+    <div class="footer-row">
+      <button class="btn" id="retakeBtn">Retake the quiz</button>
+      <button class="btn" id="printBtn">Print / save this page</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+(function(){
+
+  // ---------- DATA ----------
+
+  const PATHWAYS = {
+    cyber: {
+      name: "Cybersecurity Analyst",
+      tagline: "Keeping systems and data safe from attack",
+      blurb: "You like finding the weak point before someone else does. Cybersecurity analysts test, monitor and defend networks against hackers — a fast-growing field with roles in banks, the NHS, government and tech firms.",
+      y13: "Steer your BTEC project and optional units toward security topics wherever you get a choice",
+      nextSteps: [
+        "Apply through UCAS for a Cyber Security or Computer Science (Security) degree — most accept BTEC, some want Maths alongside it",
+        "Look at Level 4 Cyber Security Technologist degree apprenticeships — you earn while you train",
+        "Apply directly for a junior SOC analyst or IT security support role if you'd rather start working straight away"
+      ],
+      further: "Longer term: SOC analyst → security engineer → penetration tester or security architect, often backed by certifications like CompTIA Security+ and later CISSP",
+      targets: [
+        "Work through a beginner path on TryHackMe or Hack The Box properly, not just dabble",
+        "Nail the fundamentals: TCP/IP, common ports, how a firewall and VPN actually work",
+        "Start an informal CompTIA Security+ study plan for after you finish your BTEC",
+        "Keep a short write-up of any security-related coursework — the start of a portfolio for interviews or a UCAS personal statement",
+        "Follow one cybersecurity news source so you can talk confidently about a recent breach"
+      ]
+    },
+    dev: {
+      name: "Software Developer",
+      tagline: "Building the apps and programs people use every day",
+      blurb: "You enjoy the puzzle of getting code to work. Developers design, build and test the software behind websites, apps and games — one of the most in-demand careers in UK tech.",
+      y13: "Use your BTEC project units to build something substantial you can actually show, not just something to hand in",
+      nextSteps: [
+        "Apply through UCAS for a Computer Science or Software Engineering degree",
+        "Look at Level 4 Software Developer degree apprenticeships with employers like the NHS, BT or local digital agencies",
+        "Apply directly for a junior developer or trainee software role if you'd rather start working now"
+      ],
+      further: "Longer term: junior developer → mid-level → senior, or specialise into web, mobile, backend or games as you go",
+      targets: [
+        "Pick one language — Python, JavaScript or C# — and finish one project beyond your coursework",
+        "Put your code somewhere visible; a GitHub account is the standard, and worth starting now",
+        "Practise the basics you'd be asked about at interview: variables, loops, functions, debugging your own code",
+        "Check entry requirements for 3 specific university courses or degree apprenticeships, so you know exactly what you're working towards",
+        "Try one free course (freeCodeCamp, Codecademy) to fill a gap your BTEC doesn't cover"
+      ]
+    },
+    games: {
+      name: "Games Developer",
+      tagline: "Designing and coding the games people play",
+      blurb: "You like building worlds and mechanics people can play with. Games developers combine code, design and creativity — working on anything from mobile games to major studio titles.",
+      y13: "Use project units to finish one playable piece of work, rather than starting several that never get finished",
+      nextSteps: [
+        "Apply through UCAS for a Games Development or Games Design degree — check the engine/language focus matches your interests",
+        "Look at games or software apprenticeships, though these are competitive and less common than other IT routes",
+        "Build a portfolio on itch.io and apply directly for junior QA or junior developer roles as an alternative way in"
+      ],
+      further: "Longer term: junior developer/designer → specialise into gameplay programming, level design or technical art as your interests sharpen",
+      targets: [
+        "Finish one small but complete game in Unity or Godot — finished beats ambitious and unfinished",
+        "Put it on itch.io so you have something concrete to link to on applications or a CV",
+        "Study 2–3 games you admire and note specifically what makes the mechanics or level design work",
+        "Research 3 specific games courses and compare what engines and languages they actually teach",
+        "Consider QA testing as a realistic first step into a studio if development roles feel out of reach right now"
+      ]
+    },
+    network: {
+      name: "Network & Cloud Engineer",
+      tagline: "Connecting the systems that keep everything online",
+      blurb: "You like understanding how things connect and fixing what's broken. Network and cloud engineers build and maintain the infrastructure that keeps businesses, schools and services running.",
+      y13: "Use practical and project units to get real hands-on time with networking equipment or virtual labs, not just theory",
+      nextSteps: [
+        "Apply through UCAS for a Computer Networks, Cloud Computing or Computer Science degree",
+        "Look at Network Engineer or Cloud apprenticeships (Level 3–4) — a strong entry route many employers prefer over a degree",
+        "Study for CompTIA Network+ now and apply directly for a junior network or infrastructure role"
+      ],
+      further: "Longer term: junior network engineer → cloud or infrastructure specialist, backed by certifications — Network+, then Cisco CCNA or a cloud provider's associate certification",
+      targets: [
+        "Build a small home lab, even a virtual one (Cisco Packet Tracer or a couple of old routers), and actually configure something",
+        "Start working towards CompTIA Network+ — realistic to sit before or shortly after finishing your BTEC",
+        "Get comfortable with basic cloud concepts using a free tier from AWS or Azure",
+        "Research 3 network or cloud apprenticeship providers and note their entry requirements",
+        "Practise explaining networking concepts simply — support and network interviews lean heavily on this"
+      ]
+    },
+    data: {
+      name: "Data Analyst",
+      tagline: "Finding the story hidden inside numbers",
+      blurb: "You like spotting patterns and making sense of information. Data analysts turn raw numbers into insights that help organisations make decisions — used in sport, business, health and more.",
+      y13: "Choose project or optional units that let you work with a real dataset rather than a made-up example",
+      nextSteps: [
+        "Apply through UCAS for a Data Science, Maths with Computing, or Computer Science degree",
+        "Look at Data Analyst degree apprenticeships (Level 4) — a strong route if you want to start earning sooner",
+        "Apply directly for junior data or business analyst roles, especially if you can already show spreadsheet or SQL skills"
+      ],
+      further: "Longer term: junior analyst → data analyst → specialise into data science, analytics engineering or BI depending on how technical you want to go",
+      targets: [
+        "Get genuinely fluent in spreadsheets — pivot tables, VLOOKUP/XLOOKUP, and building a clean chart from messy data",
+        "Learn the basics of SQL — it's expected in almost every entry-level data role",
+        "Find one dataset you actually care about and produce a short analysis with a clear conclusion",
+        "Research 3 specific data apprenticeships or degree courses and compare their entry requirements",
+        "Try a free intro to Python for data (pandas) if you want to go beyond spreadsheets"
+      ]
+    },
+    support: {
+      name: "IT Support Technician",
+      tagline: "The person people turn to when tech goes wrong",
+      blurb: "You like fixing things and helping people. IT support technicians keep computers, networks and software running for organisations — a hands-on route into almost any tech career.",
+      y13: "Use practical units and any work experience placements to get real face-to-face troubleshooting time",
+      nextSteps: [
+        "Apply directly for an IT Support Technician apprenticeship (Level 3) — a strong, realistic route straight from a BTEC",
+        "Apply directly for a first- or second-line support role if you'd rather start working immediately",
+        "Apply through UCAS for a BSc Information Technology if you'd prefer to keep a degree route open"
+      ],
+      further: "Longer term: 1st line → 2nd/3rd line support → systems administrator, or move sideways into networking or security once you have experience",
+      targets: [
+        "Work towards CompTIA A+ — a recognised, realistic certification to have by the time you apply for roles",
+        "Get comfortable troubleshooting both Windows and at least one other OS, such as macOS or Linux",
+        "Practise explaining a technical fix in plain language — this is tested directly in support interviews",
+        "Look for any work experience or part-time role with an IT or support element, even informal",
+        "Research 3 specific IT support apprenticeship employers in your area and check their entry requirements"
+      ]
+    },
+    design: {
+      name: "UX & Digital Media Designer",
+      tagline: "Making digital things look good and work well",
+      blurb: "You like the creative side of tech — how something looks, feels and is used. UX and digital media designers shape websites, apps and graphics so they're clear, useful and enjoyable.",
+      y13: "Use project units to design something end-to-end — research, mockups, and a finished product — not just the final screens",
+      nextSteps: [
+        "Apply through UCAS for a UX Design, Digital Media, or Computer Science (design pathway) degree",
+        "Look at digital or UX apprenticeships where available — check job boards regularly, as these are less common",
+        "Build a portfolio and apply directly for junior digital design or junior UX roles"
+      ],
+      further: "Longer term: junior designer → UX/UI designer → specialise into product design or user research as you build experience",
+      targets: [
+        "Learn the basics of Figma properly — the industry standard, and free to learn",
+        "Redesign a real app or website you use and write up why you made each choice, not just what you changed",
+        "Build a simple portfolio site or folder with 2–3 finished pieces of work",
+        "Research 3 specific UX or design courses or apprenticeships and compare what they actually cover",
+        "Practise explaining your design decisions out loud — exactly what design interviews test"
+      ]
+    }
+  };
+
+  const QUESTIONS = [
+    {
+      text: "When you're solving a tricky problem, what do you enjoy most?",
+      options: [
+        {label:"Finding the flaw or weak point others missed", scores:{cyber:3, network:1}},
+        {label:"Working out the exact steps to make something work", scores:{dev:3, data:1}},
+        {label:"Testing and tweaking it until it feels right to use", scores:{games:2, design:2}},
+        {label:"Physically figuring out what's broken and fixing it", scores:{support:3, network:1}}
+      ]
+    },
+    {
+      text: "Pick a project you'd actually enjoy in your free time.",
+      options: [
+        {label:"Build a small game or interactive story", scores:{games:3, dev:1}},
+        {label:"Set up and organise a home network or a PC", scores:{network:3, support:1}},
+        {label:"Collect and chart data about something you care about", scores:{data:3}},
+        {label:"Design a poster, logo, or redesign how an app looks", scores:{design:3}}
+      ]
+    },
+    {
+      text: "Which headline would you actually stop and read?",
+      options: [
+        {label:"'Major company hit by cyberattack — how it happened'", scores:{cyber:3}},
+        {label:"'The team behind a huge game on building its world'", scores:{games:2, design:1}},
+        {label:"'How this app went from idea to a million users'", scores:{dev:2, design:1}},
+        {label:"'The data behind a team's winning season'", scores:{data:3}}
+      ]
+    },
+    {
+      text: "How do you prefer to work?",
+      options: [
+        {label:"Alone, deep in a problem with no interruptions", scores:{dev:1, data:1, cyber:1}},
+        {label:"In a small team, bouncing ideas around", scores:{games:1, design:1}},
+        {label:"Helping people directly, one at a time", scores:{support:2}},
+        {label:"Depends entirely on the day", scores:{dev:0.5, support:0.5, network:0.5}}
+      ]
+    },
+    {
+      text: "A friend's laptop won't turn on. What's your first instinct?",
+      options: [
+        {label:"Ask what happened right before it broke, then test things one by one", scores:{support:3, network:1}},
+        {label:"Check if it's a software or virus issue, and how to stop it happening again", scores:{cyber:2, support:1}},
+        {label:"Not really my thing, but I'd look up how to fix it", scores:{data:1, dev:1}},
+        {label:"I'd rather build something new than fix something old", scores:{dev:1, games:1, design:1}}
+      ]
+    },
+    {
+      text: "Which of these would you rather get better at right now?",
+      options: [
+        {label:"Coding a program from scratch", scores:{dev:3}},
+        {label:"Understanding how networks and the internet work", scores:{network:3}},
+        {label:"Making something look great — layout, colour, design", scores:{design:3}},
+        {label:"Reading and understanding data and statistics", scores:{data:3}}
+      ]
+    },
+    {
+      text: "Outside of IT itself, which of these interests you most?",
+      options: [
+        {label:"Maths and numbers", scores:{data:2, cyber:1, network:1}},
+        {label:"Art, design or media", scores:{design:3, games:1}},
+        {label:"Business and how organisations run", scores:{support:1, data:1}},
+        {label:"Honestly, just computing on its own", scores:{dev:2, cyber:2, games:1}}
+      ]
+    },
+    {
+      text: "What's your plan for after this course, roughly?",
+      options: [
+        {label:"Get straight into a job or apprenticeship as soon as I can", scores:{support:2, network:1}},
+        {label:"Go to university for a specific tech degree", scores:{dev:2, data:2, cyber:1}},
+        {label:"Start my own thing eventually — an app, a game, a business", scores:{dev:1, games:2, design:1}},
+        {label:"Not sure yet — I want to keep my options open", scores:{dev:0.5, support:0.5, design:0.5, data:0.5}}
+      ]
+    }
+  ];
+
+  // ---------- STATE ----------
+  let current = 0;
+  let selected = new Array(QUESTIONS.length).fill(null);
+
+  const quizScreen = document.getElementById('quiz-screen');
+  const resultsScreen = document.getElementById('results-screen');
+  const routeEl = document.getElementById('route');
+  const qCounter = document.getElementById('qCounter');
+  const qText = document.getElementById('qText');
+  const optionsEl = document.getElementById('options');
+  const backBtn = document.getElementById('backBtn');
+  const nextBtn = document.getElementById('nextBtn');
+
+  function renderRoute(){
+    routeEl.innerHTML = '';
+    QUESTIONS.forEach((q,i)=>{
+      const node = document.createElement('div');
+      node.className = 'node' + (selected[i]!==null ? ' done' : '') + (i===current ? ' current' : '');
+      routeEl.appendChild(node);
+      if(i < QUESTIONS.length-1){
+        const seg = document.createElement('div');
+        seg.className = 'seg' + (selected[i]!==null ? ' done' : '');
+        routeEl.appendChild(seg);
+      }
+    });
+  }
+
+  function renderQuestion(){
+    const q = QUESTIONS[current];
+    qCounter.textContent = 'Question ' + (current+1) + ' of ' + QUESTIONS.length;
+    qText.textContent = q.text;
+    optionsEl.innerHTML = '';
+    q.options.forEach((opt, i)=>{
+      const btn = document.createElement('button');
+      btn.className = 'option' + (selected[current]===i ? ' selected' : '');
+      btn.textContent = opt.label;
+      btn.addEventListener('click', ()=>{
+        selected[current] = i;
+        renderQuestion();
+        renderRoute();
+      });
+      optionsEl.appendChild(btn);
+    });
+    backBtn.disabled = current===0;
+    nextBtn.disabled = selected[current]===null;
+    nextBtn.textContent = current === QUESTIONS.length-1 ? 'See my route' : 'Next question';
+    renderRoute();
+  }
+
+  backBtn.addEventListener('click', ()=>{
+    if(current>0){ current--; renderQuestion(); }
+  });
+
+  nextBtn.addEventListener('click', ()=>{
+    if(selected[current]===null) return;
+    if(current < QUESTIONS.length-1){
+      current++;
+      renderQuestion();
+    } else {
+      showResults();
+    }
+  });
+
+  function computeScores(){
+    const totals = {cyber:0, dev:0, games:0, network:0, data:0, support:0, design:0};
+    QUESTIONS.forEach((q,i)=>{
+      const opt = q.options[selected[i]];
+      Object.keys(opt.scores).forEach(k=>{ totals[k]+=opt.scores[k]; });
+    });
+    return totals;
+  }
+
+  function showResults(){
+    const totals = computeScores();
+    const ranked = Object.keys(totals).sort((a,b)=>totals[b]-totals[a]);
+    const topKey = ranked[0];
+    const secondKey = ranked[1];
+    const top = PATHWAYS[topKey];
+    const second = PATHWAYS[secondKey];
+
+    document.getElementById('destName').textContent = top.name;
+    document.getElementById('destTagline').textContent = top.tagline;
+    document.getElementById('destBlurb').textContent = top.blurb;
+
+    const closeMatch = document.getElementById('closeMatch');
+    if(totals[secondKey] >= totals[topKey]*0.7 && totals[secondKey] > 0){
+      closeMatch.innerHTML = 'Close second: <strong>' + second.name + '</strong> — worth a look too, since a lot of your answers pointed there as well.';
+    } else {
+      closeMatch.textContent = '';
+    }
+
+    // stage line
+    const stageLine = document.getElementById('stageLine');
+    const stages = [
+      {label:'Now', detail:'Year 12 — build the habits below'},
+      {label:'Year 13', detail: top.y13},
+      {label:'After the BTEC', detail: top.nextSteps[0]},
+      {label:'Destination', detail: top.name}
+    ];
+    stageLine.innerHTML = '';
+    stages.forEach(s=>{
+      const d = document.createElement('div');
+      d.className = 'stage';
+      d.innerHTML = '<div class="dot"></div><div class="stage-label">'+s.label+'</div><div class="stage-detail">'+s.detail+'</div>';
+      stageLine.appendChild(d);
+    });
+
+    // next steps list
+    const routesList = document.getElementById('routesList');
+    routesList.innerHTML = '';
+    top.nextSteps.forEach(r=>{
+      const li = document.createElement('li');
+      li.textContent = r;
+      routesList.appendChild(li);
+    });
+    const furtherLi = document.createElement('li');
+    furtherLi.textContent = top.further;
+    routesList.appendChild(furtherLi);
+
+    // targets
+    const targetsList = document.getElementById('targetsList');
+    targetsList.innerHTML = '';
+    const storageKey = 'itrf_targets_' + topKey;
+    let checkedState = {};
+    try{ checkedState = JSON.parse(localStorage.getItem(storageKey) || '{}'); }catch(e){ checkedState = {}; }
+
+    top.targets.forEach((t, idx)=>{
+      const row = document.createElement('label');
+      row.className = 'target' + (checkedState[idx] ? ' checked' : '');
+      const cb = document.createElement('input');
+      cb.type = 'checkbox';
+      cb.checked = !!checkedState[idx];
+      const span = document.createElement('span');
+      span.textContent = t;
+      row.appendChild(cb);
+      row.appendChild(span);
+      cb.addEventListener('change', ()=>{
+        row.classList.toggle('checked', cb.checked);
+        checkedState[idx] = cb.checked;
+        try{ localStorage.setItem(storageKey, JSON.stringify(checkedState)); }catch(e){}
+      });
+      targetsList.appendChild(row);
+    });
+
+    quizScreen.hidden = true;
+    resultsScreen.hidden = false;
+    window.scrollTo({top:0, behavior:'smooth'});
+  }
+
+  document.getElementById('retakeBtn').addEventListener('click', ()=>{
+    current = 0;
+    selected = new Array(QUESTIONS.length).fill(null);
+    resultsScreen.hidden = true;
+    quizScreen.hidden = false;
+    renderQuestion();
+    window.scrollTo({top:0, behavior:'smooth'});
+  });
+
+  document.getElementById('printBtn').addEventListener('click', ()=>window.print());
+
+  renderQuestion();
+})();
+</script>
+</body>
+</html>
