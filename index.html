@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="A Year 12 BTEC IT career ambition and target-setting quiz." />
+  <title>BTEC IT Pathfinder</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="bg-orb orb-one"></div>
+  <div class="bg-orb orb-two"></div>
+
+  <header class="topbar">
+    <a class="brand" href="#" aria-label="BTEC IT Pathfinder home">
+      <span class="brand-mark" aria-hidden="true">↗</span>
+      <span>BTEC IT <strong>Pathfinder</strong></span>
+    </a>
+    <button class="ghost-btn small" id="resetTop" type="button">Start again</button>
+  </header>
+
+  <main class="shell">
+    <section id="welcomeScreen" class="screen active">
+      <div class="hero">
+        <div class="eyebrow">YEAR 12 · BTEC IT · CAREER PLANNING</div>
+        <h1>Turn “I’m not sure yet” into a <span>realistic next step.</span></h1>
+        <p class="hero-copy">
+          Answer a short series of questions about the IT work you enjoy, how you like to learn,
+          and what you want after your BTEC. You’ll finish with a possible ambition and a practical action plan.
+        </p>
+
+        <div class="feature-grid">
+          <article class="mini-card">
+            <div class="mini-icon">01</div>
+            <h3>Find your direction</h3>
+            <p>Match your interests to realistic digital job families.</p>
+          </article>
+          <article class="mini-card">
+            <div class="mini-icon">02</div>
+            <h3>Choose a route</h3>
+            <p>University, apprenticeship, degree apprenticeship or employment.</p>
+          </article>
+          <article class="mini-card">
+            <div class="mini-icon">03</div>
+            <h3>Leave with targets</h3>
+            <p>Create useful Year 12 actions instead of a vague long-term goal.</p>
+          </article>
+        </div>
+
+        <div class="privacy-note">
+          <span aria-hidden="true">●</span>
+          <p><strong>Private by design:</strong> your answers stay in this browser. No account or personal details are required.</p>
+        </div>
+
+        <button id="startBtn" class="primary-btn hero-btn" type="button">
+          Start my pathway
+          <span aria-hidden="true">→</span>
+        </button>
+        <p class="microcopy">About 8–10 minutes · There are no “right” answers.</p>
+      </div>
+    </section>
+
+    <section id="quizScreen" class="screen">
+      <div class="quiz-layout">
+        <aside class="progress-panel">
+          <div>
+            <div class="eyebrow">YOUR PROGRESS</div>
+            <div class="progress-number"><span id="progressCurrent">1</span><small>/ <span id="progressTotal">12</span></small></div>
+          </div>
+          <div class="progress-track" aria-hidden="true">
+            <div id="progressFill" class="progress-fill"></div>
+          </div>
+          <p id="progressStage" class="stage-label">Starting point</p>
+          <div class="stage-list">
+            <div class="stage-item active" data-stage="0"><span></span>Starting point</div>
+            <div class="stage-item" data-stage="1"><span></span>Your interests</div>
+            <div class="stage-item" data-stage="2"><span></span>How you work</div>
+            <div class="stage-item" data-stage="3"><span></span>Your next step</div>
+          </div>
+        </aside>
+
+        <div class="question-card">
+          <div id="questionTag" class="question-tag">QUESTION 1</div>
+          <h2 id="questionText">Question text</h2>
+          <p id="questionHelp" class="question-help"></p>
+          <div id="options" class="options" role="group" aria-label="Answer options"></div>
+          <div id="validation" class="validation" aria-live="polite"></div>
+          <div class="question-nav">
+            <button id="backBtn" class="ghost-btn" type="button">← Back</button>
+            <button id="nextBtn" class="primary-btn" type="button">Continue →</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="resultsScreen" class="screen">
+      <div class="results-head">
+        <div class="eyebrow">YOUR PATHWAY IDEAS</div>
+        <h1>Here are three directions worth exploring.</h1>
+        <p>
+          These are starting points, not labels. Read the matches, choose the one that feels most useful,
+          then turn it into your own ambition.
+        </p>
+      </div>
+
+      <div id="roleCards" class="role-grid"></div>
+
+      <div class="route-panel">
+        <div>
+          <div class="eyebrow">ROUTE MATCH</div>
+          <h2 id="routeTitle"></h2>
+          <p id="routeCopy"></p>
+        </div>
+        <div class="route-score">
+          <span id="routeBadge"></span>
+          <small>suggested starting route</small>
+        </div>
+      </div>
+
+      <div class="source-note">
+        <strong>Before deciding:</strong> use current entry requirements and vacancies, not this quiz alone.
+        The links at the end take you to official UK careers, university and apprenticeship research.
+      </div>
+
+      <div class="results-actions">
+        <button id="editAnswersBtn" class="ghost-btn" type="button">← Review answers</button>
+        <button id="buildPlanBtn" class="primary-btn" type="button">Build my action plan →</button>
+      </div>
+    </section>
+
+    <section id="planScreen" class="screen">
+      <div class="plan-head">
+        <div>
+          <div class="eyebrow">MY YEAR 12 ACTION PLAN</div>
+          <h1>Make the ambition yours.</h1>
+          <p>Select a suggested role or write your own. Then edit any target so the plan is genuinely achievable for you.</p>
+        </div>
+        <div class="plan-status">
+          <span>✓</span>
+          <strong>Quiz complete</strong>
+        </div>
+      </div>
+
+      <div class="plan-grid">
+        <section class="plan-card ambition-card">
+          <div class="section-kicker">01 · AMBITION</div>
+          <label for="ambitionInput">My current ambition is:</label>
+          <textarea id="ambitionInput" rows="4"></textarea>
+          <p class="field-help">It is fine for this to change. A useful ambition is specific enough to research, but not so narrow that it closes off alternatives.</p>
+
+          <div class="pathway-ladder">
+            <div class="ladder-step current">
+              <span>NOW</span>
+              <strong>Year 12 BTEC IT</strong>
+            </div>
+            <div class="ladder-line"></div>
+            <div class="ladder-step">
+              <span>NEXT</span>
+              <strong id="ladderNext">Build skills & evidence</strong>
+            </div>
+            <div class="ladder-line"></div>
+            <div class="ladder-step">
+              <span>AFTER BTEC</span>
+              <strong id="ladderRoute">Chosen route</strong>
+            </div>
+            <div class="ladder-line"></div>
+            <div class="ladder-step target">
+              <span>DIRECTION</span>
+              <strong id="ladderRole">Role family</strong>
+            </div>
+          </div>
+        </section>
+
+        <section class="plan-card target-card">
+          <div class="target-head">
+            <div>
+              <div class="section-kicker">02 · TARGETS</div>
+              <h2>My next five actions</h2>
+            </div>
+            <button id="refreshTargets" class="text-btn" type="button">Regenerate suggestions</button>
+          </div>
+          <div id="targetList" class="target-list"></div>
+        </section>
+      </div>
+
+      <section class="plan-card reflection-card">
+        <div class="section-kicker">03 · REFLECTION</div>
+        <div class="reflection-grid">
+          <label>
+            The target I need to start first is…
+            <textarea id="priorityInput" rows="3" placeholder="Which action will make the biggest difference right now?"></textarea>
+          </label>
+          <label>
+            I may need help with…
+            <textarea id="supportInput" rows="3" placeholder="A skill, deadline, confidence issue, contact or resource…"></textarea>
+          </label>
+        </div>
+      </section>
+
+      <section class="research-card">
+        <div>
+          <div class="section-kicker">04 · CHECK IT AGAINST THE REAL WORLD</div>
+          <h2>Research before you commit.</h2>
+          <p>Compare actual roles, course entry requirements and live apprenticeship opportunities.</p>
+        </div>
+        <div class="research-links">
+          <a href="https://nationalcareers.service.gov.uk/explore-careers/job-sector/digital" target="_blank" rel="noopener">National Careers Service <span>↗</span></a>
+          <a href="https://www.ucas.com/explore/search/all" target="_blank" rel="noopener">UCAS course search <span>↗</span></a>
+          <a href="https://www.gov.uk/apply-apprenticeship" target="_blank" rel="noopener">Find an apprenticeship <span>↗</span></a>
+        </div>
+      </section>
+
+      <div class="export-bar">
+        <div>
+          <strong>Keep a copy of your plan</strong>
+          <span>Your work is only stored on this device.</span>
+        </div>
+        <div class="export-actions">
+          <button id="copyBtn" class="ghost-btn" type="button">Copy summary</button>
+          <button id="downloadBtn" class="ghost-btn" type="button">Download .txt</button>
+          <button id="printBtn" class="primary-btn" type="button">Print / Save PDF</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <span>BTEC IT Pathfinder</span>
+    <span>Career ideas are prompts for research, not guarantees or professional careers advice.</span>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
