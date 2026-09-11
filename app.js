@@ -436,21 +436,21 @@ function generateTargets(){
 
   let research;
   if(route==="uni"){
-    research=`Before the end of Year 12, compare at least 3 relevant university courses, recording course content, entry requirements, location and what I like or dislike about each one.`;
+    research=`Before the end of this year, compare at least 3 relevant university courses, recording course content, entry requirements, location and what I like or dislike about each one.`;
   }else if(route==="degreeapp"){
-    research=`Before the end of Year 12, research at least 5 relevant degree-apprenticeship employers or programmes and record their typical entry requirements, application stages and opening dates.`;
+    research=`Before the end of this year, research at least 5 relevant degree-apprenticeship employers or programmes and record their typical entry requirements, application stages and opening dates.`;
   }else if(route==="app"){
-    research=`Before the end of Year 12, find at least 5 relevant apprenticeship or trainee opportunities and record the role, level, employer, entry requirements and skills they ask for.`;
+    research=`Before the end of this year, find at least 5 relevant apprenticeship or trainee opportunities and record the role, level, employer, entry requirements and skills they ask for.`;
   }else if(route==="job"){
-    research=`Before the end of Year 12, compare at least 5 realistic entry-level job adverts in this area and list the skills, experience and qualifications that appear most often.`;
+    research=`Before the end of this year, compare at least 5 realistic entry-level job adverts in this area and list the skills, experience and qualifications that appear most often.`;
   }else{
-    research=`Before the end of Year 12, compare 2 university options and 2 work-based options in this area, including entry requirements, costs/pay, daily experience and progression.`;
+    research=`Before the end of this year, compare 2 university options and 2 work-based options in this area, including entry requirements, costs/pay, daily experience and progression.`;
   }
 
-  const experience=`Before Year 13 begins, gain one piece of evidence from outside normal lessons: work experience, an employer event, a careers conversation, volunteering, a competition, or a relevant online challenge — and write down what I learned from it.`;
+  const experience=`Before next year begins, gain one piece of evidence from outside normal lessons: work experience, an employer event, a careers conversation, volunteering, a competition, or a relevant online challenge — and write down what I learned from it.`;
 
-  let application=`Before Year 13 begins, create or update a one-page CV and a short bank of examples showing my IT skills, teamwork, problem solving and reliability.`;
-  if(gap==="portfolio") application=`Before Year 13 begins, organise at least 2 pieces of IT work into a simple portfolio with screenshots, a short explanation of the problem, what I did and what I learned.`;
+  let application=`Before next year begins, create or update a one-page CV and a short bank of examples showing my IT skills, teamwork, problem solving and reliability.`;
+  if(gap==="portfolio") application=`Before next year begins, organise at least 2 pieces of IT work into a simple portfolio with screenshots, a short explanation of the problem, what I did and what I learned.`;
   if(gap==="experience") application=experience;
   if(gap==="applications") application=`Within the next 6 weeks, create or improve my CV and practise one application statement or interview answer using evidence from my BTEC work.`;
   if(gap==="research") application=research;
@@ -458,7 +458,7 @@ function generateTargets(){
 
   const pool=[academic,project,research,experience,application];
   return [...new Set(pool)].slice(0,5).concat([
-    "Before Year 13 begins, review this ambition with a tutor or careers adviser and change it if the evidence points to a better option."
+    "Before next year begins, review this ambition with a tutor or careers adviser and change it if the evidence points to a better option."
   ]).slice(0,5);
 }
 
@@ -496,7 +496,7 @@ function getSummary(){
   const r=routeProfiles[state.selectedRoute]||routeProfiles.open;
 
   return [
-    "BTEC IT PATHFINDER – YEAR 12 ACTION PLAN",
+    "BTEC IT PATHFINDER – ACTION PLAN",
     "========================================",
     "",
     `Ambition: ${ambition}`,
