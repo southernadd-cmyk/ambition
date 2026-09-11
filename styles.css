@@ -419,18 +419,35 @@ footer{
   .export-actions button{flex:1;min-width:140px}
   footer{flex-direction:column}
 }
+/* Kept outside the interactive layout; printed as selectable, flowing text. */
+#printPlan{display:none}
+@page{size:A4;margin:18mm}
 @media print{
-  body{background:#fff;color:#111}
-  .topbar,.resultsScreen,.export-bar,footer,.bg-orb,.text-btn,.research-links{display:none!important}
-  .screen{display:none!important}
-  #planScreen{display:block!important}
-  .plan-card,.research-card{box-shadow:none;border:1px solid #ccc;background:#fff;break-inside:avoid}
-  textarea{color:#111;background:#fff;border:1px solid #bbb;min-height:65px}
-  .eyebrow,.section-kicker,.ladder-step span,.target-num{color:#155e55!important}
-  .plan-head p,.field-help,.research-card p{color:#444}
-  .plan-grid{grid-template-columns:1fr 1fr}
-  .research-card{grid-template-columns:1fr}
+  html,body{background:#fff!important;color:#111!important;overflow:visible!important;min-height:0}
+  body > :not(#printPlan){display:none!important}
+  #printPlan{
+    display:block!important;
+    font-family:Arial,sans-serif;
+    font-size:11pt;
+    line-height:1.5;
+    width:auto;
+    margin:0;
+    color:#111;
+  }
+  #printPlan h1{font-size:21pt;line-height:1.2;margin:0 0 12pt;letter-spacing:normal}
+  #printPlan h2{font-size:14pt;margin:18pt 0 6pt;color:#155e55}
+  #printPlan h3{font-size:11pt;margin:10pt 0 4pt}
+  #printPlan h1,#printPlan h2,#printPlan h3{break-after:avoid;page-break-after:avoid}
+  #printPlan p{
+    margin:0 0 8pt;
+    white-space:pre-wrap;
+    overflow-wrap:anywhere;
+    orphans:3;
+    widows:3;
+  }
+  #printPlan a{color:#111;text-decoration:underline;overflow-wrap:anywhere}
 }
+
 
 .card-subhead{
   margin-top:14px;

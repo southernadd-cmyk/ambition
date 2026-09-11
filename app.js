@@ -518,6 +518,49 @@ function getSummary(){
   ].join("\n");
 }
 
+// Build a text-only document from current field values, including unsaved edits.
+// beforeprint also covers Ctrl+P and the browser's own Print menu.
+function preparePrintPlan(){
+  document.getElementById("printPlan")?.remove();
+  const report=document.createElement("article");
+  report.id="printPlan";
+  const add=(tag,text,parent=report)=>{
+    const element=document.createElement(tag);
+    element.textContent=text;
+    parent.appendChild(element);
+    return element;
+  };
+  const field=id=>document.getElementById(id).value.trim() || "Not completed yet";
+  add("h1","BTEC IT Pathfinder – Action Plan");
+  add("p",`Created: ${new Date().toLocaleDateString("en-GB")}`);
+  add("h2","My ambition");
+  add("p",field("ambitionInput"));
+  add("h2","My pathway");
+  add("p",`Now: BTEC IT`);
+  add("p",`Next: ${document.getElementById("ladderNext").textContent}`);
+  add("p",`Suggested route: ${document.getElementById("ladderRoute").textContent}`);
+  add("p",`Direction: ${document.getElementById("ladderRole").textContent}`);
+  add("h2","My next actions");
+  document.querySelectorAll("#targetList textarea").forEach((input,index)=>{
+    add("h3",`Target ${index+1}`);
+    add("p",input.value.trim() || "Not completed yet");
+  });
+  add("h2","First priority");
+  add("p",field("priorityInput"));
+  add("h2","Help and support I may need");
+  add("p",field("supportInput"));
+  add("h2","Research next");
+  document.querySelectorAll(".research-links a").forEach(link=>{
+    const paragraph=add("p","");
+    const a=add("a",`${link.textContent.replace("↗","").trim()}: ${link.href}`,paragraph);
+    a.href=link.href;
+  });
+  add("p","Reminder: this is a planning prompt. Check current entry requirements and opportunities before making a final decision.");
+  document.body.appendChild(report);
+}
+window.addEventListener("beforeprint",preparePrintPlan);
+window.addEventListener("afterprint",()=>document.getElementById("printPlan")?.remove());
+
 function escapeHtml(str){
   return String(str).replace(/[&<>"']/g, m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"}[m]));
 }
@@ -548,7 +591,10 @@ document.getElementById("editAnswersBtn").addEventListener("click",()=>{
 });
 document.getElementById("buildPlanBtn").addEventListener("click",buildPlan);
 document.getElementById("refreshTargets").addEventListener("click",()=>renderTargets(generateTargets()));
-document.getElementById("printBtn").addEventListener("click",()=>window.print());
+document.getElementById("printBtn").addEventListener("click",()=>{
+  preparePrintPlan();
+  window.print();
+});
 document.getElementById("copyBtn").addEventListener("click",async()=>{
   const btn=document.getElementById("copyBtn");
   try{
